@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html>
+<head> 
+<style>
+#page_frame{
+	width:100%;
+}
+#page_show{
+	width:100%;
+}
+#page_cover{
+	display:block;
+	position:absolute;
+	width:100%;
+	height:100%;
+	/*border: 2px solid red;*/
+}
+body{background-color: black;}
+.toolbox{
+	position:fixed;
+	display:block;
+	float: left;
+	background-color: black;
+    color: white;
+    z-index:100;
+}
+.note{
+	position:absolute;
+	display:block;
+	left:10%;
+	top:15%;
+}
+.selection{
+	border: 2px solid red;
+	position:absolute;
+	display:block;
+}
+.button{
+    width:1em;
+}
+</style>
+<script language = "javascript">
+var page = 1
+var box = 0
+var width, height
+
+function refresh()
+{
+	box = (img.height>img.width)?img.height:img.width//((img.clientHeight>img.clientWidth)?img.clientHeight:img.clientWidth)  
+	img.src = "/library/pager?id=${id}&page=" + page + "&box=" + box
+	img.onload=function(){
+	    setTimeout("refresh2()", 250)
+	}
+	surface.style.width = img.width + 'px'
+	surface.style.height = img.height + 'px'
+}
+
+function refresh2()
+{
+	box = (img.height>img.width)?img.height:img.width //((img.clientHeight>img.clientWidth)?img.clientHeight:img.clientWidth)  
+	img.src = "/library/pager?id=${id}&page=" + page + "&box=" + box
+	img.onload = onload_img
+	surface.style.width = img.width + 'px'
+	surface.style.height = img.height + 'px'
+}
+
+function next_page()
+{
+	output.innerHTML = "Cargando..."
+	page++
+	refresh()
+	delete_objects()
+}
+
+function prev_page()
+{
+	output.innerHTML = "Cargando..."
+	page--
+	if(page == 0)
+		document.location="/library/all.html"
+	refresh()
+	delete_objects()
+}
+
+function jump_to(new_page)
+{
+	output.innerHTML = "Cargando..."
+	page = new_page
+	refresh()
+	delete_objects()
+}
+
+function go_up()
+{
+	document.location="/library/all.html"
+}
+
+/************************
+ *** SUPERPUESTOS
+ ************************/
+
+var overlays = new Array()
+ 
+function delete_objects()
+{
+	for(var i = overlays.length - 1; i >= 0; --i)
+	{
+		frame.removeChild(overlays[i])
+		overlays.pop()
+	}
+}
+
+/************
+ ** NOTAS
+ *************/
+
+function set_put_note()
+{
+	surface.onclick = add_note
+}
+ 
+var notes = new Array()
+
+function add_note(ev)
+{
+	var note = new Image()
+	note.src = "/note.gif"
+	note.className = "note"
+	note.style.top = (ev.clientY - note.height/2.0 + window.pageYOffset) + 'px'
+	note.style.left = (ev.clientX - note.width/2.0 + window.pageXOffset) + 'px'
+	frame.appendChild(note)
+	overlays.push(note)
+	
+	surface.onclick = null
+}
+
+/****************************
+  *** RECTS
+  ***************************/
+
+function Rectangle()
+{
+	var top = 0
+	var left = 0
+	var width = 0
+	var height = 0
+	this.gui_object = null
+	
+	var object = this
+	
+	this.redim = function(ev)
+	{
+		width = ev.clientX + window.pageXOffset - left
+		height = ev.clientY + window.pageYOffset - top
+
+		object.gui_object.style.width = width + 'px'
+		object.gui_object.style.height = height + 'px'
+	}
+	
+	this.finish = function(ev)
+	{
+		surface.onmousemove = null
+		object.gui_object.onmousemove = null
+		surface.onmousedown = null
+		object.gui_object.onmousedown = null
+		surface.onclick = null
+		
+		if(ev.button == 2)
+		{
+			object.gui_object.style.display = 'none'
+			frame.removeChild(object.gui_object)
+			object.gui_object = null
+		}
+		else{
+			object.redim(ev)
+		}
+
+	}
+	
+	this.create = function(ev)
+	{
+		object.gui_object = document.createElement('div')
+		object.gui_object.className = 'selection'
+		top = (ev.clientY + window.pageYOffset)
+		left = (ev.clientX + window.pageXOffset)
+		object.gui_object.style.top = top + 'px'
+		object.gui_object.style.left = left + 'px'
+		frame.appendChild(object.gui_object)
+		overlays.push(object.gui_object)
+		
+		surface.onmousemove = object.redim
+		object.gui_object.onmousemove = object.redim
+		surface.onmousedown = object.finish
+		object.gui_object.onmousedown = object.finish
+	}	
+}
+
+function set_put_rect()
+{
+	rect = new Rectangle()
+	surface.onclick = rect.create 
+}
+</script>
+</head>
+<body>
+
+<div class = "toolbox">
+	<image class="button" src="/left_arrow.png" onclick="prev_page();">
+	<img class="button" src="/up_arrow.png" onclick="go_up();">
+	<img class="button" src="/right_arrow.png" onclick="next_page();">
+          <input type="button" value="enfocar" onclick="refresh();">
+	<input type="button" value="anotar" onclick="set_put_note();">
+	<input type="button" value="rectangulo" onclick="set_put_rect();">
+	<input id="page_number" type="text" value="" size="3">
+	<input type="button" value="Ir" onclick="jump_to(document.getElementById('page_number').value);">
+	<span id="output"> </span>
+</div>
+
+<div id="page_frame">
+	<img id="page_cover" src="/blank.gif" oncontextmenu="return false;">
+	<img id="page_show" src="/codex.jpg" onload="onload_img();">
+	<div class="selection"> </div>
+</div>
+<script language="javascript">
+var img = document.getElementById('page_show')
+
+var output = document.getElementById('output')
+
+var number = document.getElementById('page_number')
+
+var frame = document.getElementById('page_frame')
+
+var surface = document.getElementById('page_cover') 
+
+function onload_img(){
+	number.value = page
+	output.innerHTML = "  "
+}
+
+page=1
+refresh()
+img.style.width = img.width + 'px'
+img.style,height = img.height + 'px'
+</script>
+</body>
+</html>
