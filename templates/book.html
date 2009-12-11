@@ -230,6 +230,10 @@ var frame = document.getElementById('page_frame')
 
 var surface = document.getElementById('page_cover') 
 
+var images = new Array()
+for(i = -3; i < 4; ++i)
+	images.push(new Image())
+
 function onload_img(){
 	number.value = page
 	output.innerHTML = "  "
@@ -241,11 +245,6 @@ page=1
 refresh()
 img.style.width = img.width + 'px'
 img.style,height = img.height + 'px'
-
-var images = new Array()
-for(i = -3; i < 4; ++i)
-	images.push(new Image())
-
 </script>
 </body>
 </html>
