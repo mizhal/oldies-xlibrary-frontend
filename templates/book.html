@@ -118,8 +118,6 @@ function set_put_note()
 {
 	surface.onclick = add_note
 }
- 
-var notes = new Array()
 
 function add_note(ev)
 {
@@ -235,12 +233,19 @@ var surface = document.getElementById('page_cover')
 function onload_img(){
 	number.value = page
 	output.innerHTML = "  "
+	for(i = 0; i < 4; ++i)
+        images[i].src = "/library/pager?id=${id}&page=" + (page+i+1) + "&box=" + box
 }
 
 page=1
 refresh()
 img.style.width = img.width + 'px'
 img.style,height = img.height + 'px'
+
+var images = new Array()
+for(i = 0; i < 4; ++i)
+	images.push(new Image())
+
 </script>
 </body>
 </html>
