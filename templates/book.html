@@ -241,7 +241,7 @@ function onload_img(){
 	number.value = page
 	output.innerHTML = "  "
 	for(i = -3; i < 4; ++i)
-        images[i].src = "/library/pager?id=${id}&page=" + (page+i) + "&box=" + box
+        images[i+3].src = "/library/pager?id=${id}&page=" + (page+i) + "&box=" + box
 }
 
 page=1
