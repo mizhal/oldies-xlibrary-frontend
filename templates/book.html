@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <html>
 <head> 
+<title>$title</title>
 <style>
 #page_frame{
 	width:100%;
@@ -237,11 +238,24 @@ var frame = document.getElementById('page_frame')
 
 var surface = document.getElementById('page_cover') 
 
+var flip = 0
+
 function onload_img(){
-	number.value = page
-	output.innerHTML = "  "
-	for(i = -3; i < 4; ++i)
-        images[i+3].src = "/library/pager?id=${id}&page=" + (page+i) + "&box=" + box
+        number.value = page
+        output.innerHTML = "  "
+        
+        if(flip)
+	{
+                for(i = -1; i < 2; ++i)
+                        images[i+1].src = "/library/pager?id=${id}&page=" + (page+i) + "&box=" + box
+                flip = 0
+        }
+        else flip = 1
+}
+
+function zoom_in()
+{
+        img.style.width="150%"
 }
 
 page=1
